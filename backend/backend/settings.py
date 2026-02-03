@@ -114,10 +114,11 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:5500",
     "http://127.0.0.1:5500",
+    "http://localhost:5500",
     "https://superb-manatee-5a80cb.netlify.app",
 ]
+
 
 
 CORS_ALLOW_CREDENTIALS = True

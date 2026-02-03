@@ -25,7 +25,7 @@ function clearMsgs() {
 
 async function loadEmployeesDropdown() {
   employeeSelect.innerHTML = "";
-  const employees = await apiRequest("/employees/");
+  const employees = await apiGet("/employees/");
 
   if (!employees || employees.length === 0) {
     const opt = document.createElement("option");
@@ -56,7 +56,7 @@ function getFilterQuery() {
 
 async function loadSummary(employeeId) {
   try {
-    const s = await apiRequest(`/employees/${employeeId}/attendance/summary/`);
+    const s = await apiGet(`/employees/${employeeId}/attendance/summary/`);
     summaryText.textContent = `Present: ${s.total_present} | Absent: ${s.total_absent}`;
   } catch {
     summaryText.textContent = "";
@@ -79,7 +79,7 @@ async function loadAttendanceRecords() {
 
   try {
     const q = getFilterQuery();
-    const records = await apiRequest(`/employees/${employeeId}/attendance/${q}`);
+    const records = await apiGet(`/employees/${employeeId}/attendance/${q}`);
     await loadSummary(employeeId);
 
     if (!records || records.length === 0) {
@@ -119,7 +119,7 @@ attendanceForm.addEventListener("submit", async (ev) => {
   btnMark.textContent = "Saving...";
 
   try {
-    await apiRequest("/attendance/", {
+    await apiGet("/attendance/", {
       method: "POST",
       body: JSON.stringify({
         employee: Number(employeeId),
