@@ -1,7 +1,8 @@
 // ✅ CHANGE THIS after backend deployment
 // Example: https://your-backend.onrender.com
-const BACKEND_BASE = "http://127.0.0.1:8000";
+const BACKEND_BASE = "https://hrms-lite-backend-hmyy.onrender.com";
 const API_BASE = `${BACKEND_BASE}/api`;
+
 
 
 function show(el) { el.classList.remove("d-none"); }
