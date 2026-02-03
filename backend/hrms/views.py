@@ -2,6 +2,8 @@ from django.db import IntegrityError
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework import generics
+
 
 from .models import Employee
 from .serializers import EmployeeSerializer, AttendanceSerializer
@@ -33,6 +35,11 @@ class EmployeeDeleteAPI(APIView):
         emp.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
+from .models import Attendance
+
+class AttendanceListCreateApi(generics.ListCreateAPIView):
+    queryset = Attendance.objects.all().order_by("-date")
+    serializer_class = AttendanceSerializer
 
 class AttendanceCreateAPI(APIView):
     def post(self, request):

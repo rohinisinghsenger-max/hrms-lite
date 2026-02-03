@@ -119,14 +119,14 @@ attendanceForm.addEventListener("submit", async (ev) => {
   btnMark.textContent = "Saving...";
 
   try {
-    await apiGet("/attendance/", {
-      method: "POST",
-      body: JSON.stringify({
-        employee: Number(employeeId),
-        date,
-        status: statusVal
-      })
-    });
+    await apiRequest("/attendance/", {
+  method: "POST",
+  body: JSON.stringify({
+    employee: Number(employeeId),
+    date,
+    status: statusVal.toUpperCase()
+  })
+});
 
     setMsg(attSuccess, "Attendance marked successfully.");
     await loadAttendanceRecords();
@@ -149,3 +149,6 @@ btnRefresh.addEventListener("click", async () => {
   await loadEmployeesDropdown();
   await loadAttendanceRecords();
 })();
+
+
+
