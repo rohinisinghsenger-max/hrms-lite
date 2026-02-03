@@ -1,26 +1,51 @@
 // ✅ CHANGE THIS after backend deployment
 // Example: https://your-backend.onrender.com
 const BACKEND_BASE = "https://hrms-lite-backend-hmyy.onrender.com";
+// const BACKEND_BASE = ""
 const API_BASE = `${BACKEND_BASE}/api`;
 
-
-
-function show(el) { el.classList.remove("d-none"); }
-function hide(el) { el.classList.add("d-none"); }
-
+// Generic API helpers
 async function apiRequest(path, options = {}) {
-  const res = await fetch(`${API_BASE}${path}`, {
-    headers: { "Content-Type": "application/json" },
+  const url = `${API_BASE}${path}`;
+
+  const res = await fetch(url, {
+    headers: {
+      "Content-Type": "application/json",
+      ...(options.headers || {}),
+    },
     ...options,
   });
 
-  const text = await res.text();
   let data = null;
-  try { data = text ? JSON.parse(text) : null; } catch { data = text; }
+  const text = await res.text();
+  try {
+    data = text ? JSON.parse(text) : null;
+  } catch {
+    data = text;
+  }
 
   if (!res.ok) {
-    const msg = (data && data.detail) ? data.detail : "Request failed";
+    // Django/DRF errors often come as {detail: "..."} or field errors
+    const msg =
+      (data && data.detail) ||
+      (typeof data === "string" && data) ||
+      `Request failed (${res.status})`;
     throw new Error(msg);
   }
   return data;
+}
+
+function apiGet(path) {
+  return apiRequest(path, { method: "GET" });
+}
+
+function apiPost(path, payload) {
+  return apiRequest(path, {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+}
+
+function apiDelete(path) {
+  return apiRequest(path, { method: "DELETE" });
 }

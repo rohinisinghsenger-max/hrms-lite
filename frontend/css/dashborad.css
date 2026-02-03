@@ -1,0 +1,31 @@
+/* frontend/css/dashboard.css */
+
+/* Dashboard cards only */
+.dash-cards {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.dash-card {
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  padding: 14px;
+  background: #fff;
+}
+
+.dash-card-label {
+  color: #6b7280;
+  font-size: 14px;
+}
+
+.dash-card-value {
+  font-size: 28px;
+  font-weight: 800;
+  margin-top: 6px;
+}
+
+@media (max-width: 820px) {
+  .dash-cards { grid-template-columns: 1fr; }
+}
