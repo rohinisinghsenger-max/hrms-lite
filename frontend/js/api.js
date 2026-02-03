@@ -1,8 +1,8 @@
 // ✅ CHANGE THIS after backend deployment
 // Example: https://your-backend.onrender.com
 const BACKEND_BASE = "https://hrms-lite-backend-hmyy.onrender.com";
-// const BACKEND_BASE = ""
 const API_BASE = `${BACKEND_BASE}/api`;
+
 
 // Generic API helpers
 async function apiRequest(path, options = {}) {
@@ -48,4 +48,15 @@ function apiPost(path, payload) {
 
 function apiDelete(path) {
   return apiRequest(path, { method: "DELETE" });
+}
+
+// UI helpers (used by attendance.js / employees.js)
+function show(el) {
+  if (!el) return;
+  el.classList.remove("hidden");
+}
+
+function hide(el) {
+  if (!el) return;
+  el.classList.add("hidden");
 }
