@@ -10,13 +10,71 @@ const emptyState = document.getElementById("emptyState");
 const listState = document.getElementById("listState");
 
 function setMsg(el, msg) { el.textContent = msg; show(el); }
+
 function clearMsgs() {
   hide(empError); empError.textContent = "";
   hide(empSuccess); empSuccess.textContent = "";
 }
 
+function show(el) { el.classList.remove("d-none"); }
+function hide(el) { el.classList.add("d-none"); }
+
+// Better email validation (still simple)
 function validateEmail(email) {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email);
+}
+
+function normalizeEmployeeId(v) {
+  return (v || "").trim().toUpperCase();
+}
+
+function validateEmployee({ employee_id, full_name, email, department }) {
+  const errors = [];
+
+  // Employee ID
+  if (!employee_id) errors.push("Employee ID is required.");
+  else {
+    if (employee_id.length < 3) errors.push("Employee ID must be at least 3 characters.");
+    if (employee_id.length > 20) errors.push("Employee ID must be at most 20 characters.");
+    if (!/^[A-Z0-9_-]+$/.test(employee_id)) {
+      errors.push("Employee ID can contain only letters, numbers, underscore (_) or hyphen (-).");
+    }
+    // Optional strict EMP pattern:
+    // if (!/^EMP\d{3,}$/.test(employee_id)) errors.push("Employee ID should look like EMP001.");
+  }
+
+  // Full name
+  if (!full_name) errors.push("Full Name is required.");
+  else {
+    if (full_name.length < 2) errors.push("Full Name must be at least 2 characters.");
+    if (full_name.length > 60) errors.push("Full Name must be at most 60 characters.");
+  }
+
+  // Email
+  if (!email) errors.push("Email is required.");
+  else if (!validateEmail(email)) errors.push("Please enter a valid email address.");
+
+  // Department
+  if (!department) errors.push("Department is required.");
+  else {
+    if (department.length < 2) errors.push("Department must be at least 2 characters.");
+    if (department.length > 40) errors.push("Department must be at most 40 characters.");
+  }
+
+  return errors;
+}
+
+// Helper: try to show nicer server error messages
+function getNiceErrorMessage(err) {
+  const status = err?.status;
+  const msg = err?.message || "Something went wrong. Please try again.";
+
+  if (status === 409) return "Employee ID already exists. Please use a different Employee ID.";
+  // Some backends return 400 with duplicate message
+  if (status === 400 && /duplicate|already/i.test(msg)) {
+    return "Employee ID already exists. Please use a different Employee ID.";
+  }
+  return msg;
 }
 
 async function loadEmployees() {
@@ -32,7 +90,7 @@ async function loadEmployees() {
       show(emptyState);
       return;
     }
-    console.log(employees,"===============================")
+
     listState.textContent = "";
 
     for (const e of employees) {
@@ -52,7 +110,7 @@ async function loadEmployees() {
     }
   } catch (err) {
     listState.textContent = "";
-    setMsg(empError, err.message);
+    setMsg(empError, getNiceErrorMessage(err));
   }
 }
 
@@ -69,7 +127,7 @@ tbody.addEventListener("click", async (ev) => {
     await loadEmployees();
     setMsg(empSuccess, "Employee deleted successfully.");
   } catch (err) {
-    setMsg(empError, err.message);
+    setMsg(empError, getNiceErrorMessage(err));
   } finally {
     btn.disabled = false;
   }
@@ -79,17 +137,15 @@ form.addEventListener("submit", async (ev) => {
   ev.preventDefault();
   clearMsgs();
 
-  const employee_id = document.getElementById("employee_id").value.trim();
+  // Normalize & trim
+  const employee_id = normalizeEmployeeId(document.getElementById("employee_id").value);
   const full_name = document.getElementById("full_name").value.trim();
-  const email = document.getElementById("email").value.trim();
+  const email = document.getElementById("email").value.trim().toLowerCase();
   const department = document.getElementById("department").value.trim();
 
-  if (!employee_id || !full_name || !email || !department) {
-    return setMsg(empError, "All fields are required.");
-  }
-  if (!validateEmail(email)) {
-    return setMsg(empError, "Please enter a valid email address.");
-  }
+  // Validation
+  const errors = validateEmployee({ employee_id, full_name, email, department });
+  if (errors.length) return setMsg(empError, errors.join(" "));
 
   btnAdd.disabled = true;
   btnAdd.textContent = "Adding...";
@@ -103,7 +159,7 @@ form.addEventListener("submit", async (ev) => {
     await loadEmployees();
     setMsg(empSuccess, "Employee added successfully.");
   } catch (err) {
-    setMsg(empError, err.message);
+    setMsg(empError, getNiceErrorMessage(err));
   } finally {
     btnAdd.disabled = false;
     btnAdd.textContent = "Add Employee";

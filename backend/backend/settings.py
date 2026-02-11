@@ -87,11 +87,17 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
+import os
+import dj_database_url
+
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    "default": dj_database_url.config(
+        default=os.environ.get("postgresql://hrms_qkop_user:HrZRwuaG0EKKVcGiFKtCABNQNJ7vcRLt@dpg-d665r3npm1nc738n48k0-a/hrms_qkop"),
+        conn_max_age=600,
+        ssl_require=True,
+    )
 }
 
 
